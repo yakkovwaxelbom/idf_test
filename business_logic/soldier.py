@@ -52,5 +52,13 @@ class Soldier:
             'placement_status': self._placement_status.name.lower()
         }
 
+    @property
+    def personal_number(self):
+        return self._personal_number
+
+    @property
+    def distance(self):
+        return self._distance
+
     def __str__(self):
         return '\n'.join([f'{k}: {v}' for k, v in self.to_dict().items()])
