@@ -51,6 +51,7 @@ class Soldier:
     def personal_number(self):
         return self._personal_number
 
+
     @property
     def distance(self):
         return self._distance
