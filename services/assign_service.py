@@ -25,11 +25,14 @@ def validate_headers(header, hebrew_fields, fields):
 def validate_algorithm(algorithm, priority_algorithms):
     algorithm_func = priority_algorithms.get(algorithm)
     if not algorithm_func:
-        return None, HTTPException(
+        return False, HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="algorithm not valid"
         )
-    return algorithm_func, None
+
+    seven_harvests.priority_algorithms = algorithm
+
+    return False, None
 
 
 def parse_soldiers(records):
@@ -63,6 +66,7 @@ def create_assign_result(military_base, assign_details):
         "soldiers_details": soldiers_details
     }
 
+
 def process_assign_from_csv(file: UploadFile, algorithm):
     file_details = process_file(file)
 
@@ -74,7 +78,7 @@ def process_assign_from_csv(file: UploadFile, algorithm):
     if error:
         return None, error
 
-    algorithm_func, error = validate_algorithm(
+    res, error = validate_algorithm(
         algorithm,
         MilitaryBase.soldier_priority_algorithms
     )
@@ -86,8 +90,20 @@ def process_assign_from_csv(file: UploadFile, algorithm):
     soldiers = parse_soldiers(file_details["data"])
 
     seven_harvests.add_soldiers(soldiers)
-    assign_details = seven_harvests.room_allocation(algorithm_func)
+    assign_details = seven_harvests.room_allocation()
 
     res = create_assign_result(seven_harvests, assign_details)
 
     return res, error
+
+
+def get_space():
+    return seven_harvests.house_info()
+
+
+def get_waiting():
+    return seven_harvests.waiting_list()
+
+
+def search_by_id(id):
+    return seven_harvests.search_by_personal_number(id)
